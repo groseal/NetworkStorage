@@ -60,7 +60,6 @@ public class Controller implements Initializable {
         refreshLocalFilesList();
     }
 
-
     //действие по кнопке uploadServerButton
     public void uploadFileClient(ActionEvent actionEvent) {
         if (fileNameField.getLength() > 0) {
