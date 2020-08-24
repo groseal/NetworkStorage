@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+        <children>
+            <Button fx:id="downloadServerButton" layoutX="304.0" layoutY="89.0" mnemonicParsing="false" onAction="#downloadFileServer" prefHeight="26.0" prefWidth="287.0" text="Download from server" />
+            <Button fx:id="uploadServerButton" layoutX="9.0" layoutY="89.0" mnemonicParsing="false" onAction="#uploadFileClient" prefHeight="26.0" prefWidth="287.0" text="Upload to server" />
+            <Label layoutX="106.0" layoutY="129.0" text="Files on the client" />
+            <Label layoutX="388.0" layoutY="129.0" text="Files on the server" />
+            <ListView fx:id="clientListView" layoutX="58.0" layoutY="176.0" prefHeight="245.0" prefWidth="293.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" />
+            <ListView fx:id="serverListView" prefHeight="245.0" prefWidth="293.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
+            <TextField fx:id="fileNameField" layoutX="9.0" layoutY="54.0" prefHeight="26.0" prefWidth="583.0" promptText="Enter a name for the file to receive or transfer and click the appropriate button" />
+         <HBox prefHeight="38.0" prefWidth="600.0" spacing="5.0">
+            <children>
+                  <TextField fx:id="loginField" prefHeight="26.0" prefWidth="190.0" promptText="login" />
+                  <TextField fx:id="passwordField" prefHeight="26.0" prefWidth="183.0" promptText="password" />
+                  <Button fx:id="connectButton" mnemonicParsing="false" onAction="#authorization" prefHeight="26.0" prefWidth="99.0" text="Connect" />
+                  <Button fx:id="disconnectButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="96.0" text="Disconnect" />
+            </children>
+            <padding>
+               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+         </HBox>
+        </children>
+    </AnchorPane>
+</GridPane>
