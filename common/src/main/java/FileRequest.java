@@ -1,3 +1,4 @@
+
 public class FileRequest extends AbstractMessage {
     private String filename;// имя файла по которому сервер понимает что хочет клиент
 
