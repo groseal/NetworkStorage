@@ -16,12 +16,11 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
                 ctx.writeAndFlush(fm);//отправляет сформированный FileMessage клиенту
             }
         }
-        else if (msg instanceof FileMessage){
+        if (msg instanceof FileMessage){
             FileMessage fm = (FileMessage) msg;
             Files.write(Paths.get("server_storage/"
                     + fm.getFilename()), fm.getData(), StandardOpenOption.CREATE);
         }
-        //прописать тут логику если клиент прислал на сервер сообщение типа FileMessage (1.51 видео)
     }
 
     @Override

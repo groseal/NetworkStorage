@@ -61,19 +61,19 @@ public class Controller implements Initializable {
         refreshLocalFilesList();
     }
 
-    //действие по кнопке uploadServerButton
-    public void uploadFileClient(ActionEvent actionEvent) {
+    //действие по кнопке downloadServerButton. Загрузка файла на сервер
+    public void downloadFileServer (ActionEvent actionEvent) {
         if (fileNameField.getLength() > 0) {
             Network.sendMsg(new FileRequest(fileNameField.getText()));//клиент посылает серверу FileRequest с именем интересующего файла
             fileNameField.clear();//очищает форму в интерфейсе
         }
     }
 
-    //действие по кнопке downloadServerButton
-    public void downloadFileServer(ActionEvent actionEvent) throws IOException {
+    //действие по кнопке uploadServerButton. Загрузка файла на клиент
+    public void uploadFileClient(ActionEvent actionEvent) throws IOException {
         if (fileNameField.getLength() > 0) {
-            if (Files.exists(Paths.get("client_storage/" + fileNameField))) {
-                Network.sendMsg(new FileMessage(Paths.get("client_storage/" + fileNameField)));
+            if (Files.exists(Paths.get("client_storage/" + fileNameField.getText()))) {
+               Network.sendMsg(new FileMessage(Paths.get("client_storage/" + fileNameField.getText())));
                 fileNameField.clear();
             }
         }
