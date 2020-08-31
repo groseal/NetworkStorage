@@ -12,28 +12,24 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class Server {
     public void run() throws Exception {
-        EventLoopGroup mainGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
-            b.group(mainGroup, workerGroup)
+            b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(
-                                    new ObjectDecoder(50 * 1024 * 1024, ClassResolvers.cacheDisabled(null)),
-                                    new ObjectEncoder(),
-                                    new MainHandler()
-                            );
+                    .childHandler(new ChannelInitializer<SocketChannel>() { // (4)
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new ProtoHandler());
                         }
                     });
-
-//                    .childOption(ChannelOption.SO_KEEPALIVE, true);
-            ChannelFuture future = b.bind(8189).sync();
-            future.channel().closeFuture().sync();
+            // .childOption(ChannelOption.SO_KEEPALIVE, true);
+            ChannelFuture f = b.bind(8189).sync();
+            f.channel().closeFuture().sync();
         } finally {
-            mainGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
         }
     }
 

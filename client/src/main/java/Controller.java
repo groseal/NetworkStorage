@@ -9,10 +9,14 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.Channel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
+
+import static java.lang.Thread.currentThread;
 
 public class Controller implements Initializable {
     @FXML
@@ -38,47 +42,79 @@ public class Controller implements Initializable {
     }
 
     public void initialize(URL location, ResourceBundle resources) {//инплементированный метод
-        Network.start();
-        Thread t = new Thread(() -> {//демон поток ожидающий файлы от сервера
-            try {
-                while (true) {
-                    AbstractMessage am = Network.readObject();//ожидает любые сообщения от сервера
-                    if (am instanceof FileMessage) {//если сервер прислал FileMessage
-                        FileMessage fm = (FileMessage) am;//кастует полученное сообщение к FileMessage
-                        Files.write(Paths.get("client_storage/"
-                                + fm.getFilename()), fm.getData(), StandardOpenOption.CREATE);//записывает полученный файл в client_storage
-                        refreshLocalFilesList();//обновляет список файлов в client_storage
-                    }
-                }
-            } catch (ClassNotFoundException | IOException e) {
-                e.printStackTrace();
-            } finally {
-                Network.stop();
-            }
-        });
-        t.setDaemon(true);
-        t.start();
+        CountDownLatch networkStarter = new CountDownLatch(1);//создание защелки на 1 щелчок
+        new Thread(() -> Network.getInstance().start(networkStarter)).start();//запуск сети в отдельном потоке
+        try {
+            networkStarter.await();//ожидает открытия сетевого соединения
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         refreshLocalFilesList();
     }
 
-    //действие по кнопке downloadServerButton. Загрузка файла на сервер
-    public void downloadFileServer (ActionEvent actionEvent) {
-        if (fileNameField.getLength() > 0) {
-            Network.sendMsg(new FileRequest(fileNameField.getText()));//клиент посылает серверу FileRequest с именем интересующего файла
-            fileNameField.clear();//очищает форму в интерфейсе
-        }
+    public void uploadFileClient(ActionEvent actionEvent) throws Exception {
+
     }
 
-    //действие по кнопке uploadServerButton. Загрузка файла на клиент
-    public void uploadFileClient(ActionEvent actionEvent) throws IOException {
-        if (fileNameField.getLength() > 0) {
-            if (Files.exists(Paths.get("client_storage/" + fileNameField.getText()))) {
-               Network.sendMsg(new FileMessage(Paths.get("client_storage/" + fileNameField.getText())));
-                fileNameField.clear();
+
+    public void downloadFileServer(ActionEvent actionEvent) throws Exception{
+        //Действия по finishListener (из ProtoFileSender, метод sendFile)
+        ProtoFileSender.sendFile((byte) 25, Paths.get("client_storage/"+fileNameField.getText()), Network.getInstance().getCurrentChannel(), future -> {//указываем файл и сеть для отправки
+            if (!future.isSuccess()) {//действие при неудачной передаче файла
+                future.cause().printStackTrace();
+//                Network.getInstance().stop();
             }
-        }
+            if (future.isSuccess()) {//действие при удачной передаче файла
+                System.out.println("Файл успешно передан");
+//                Network.getInstance().stop();
+            }
+        });
+        fileNameField.clear();//очищает форму в интерфейсе
     }
 
+
+
+//        Network.start();
+//        Thread t = new Thread(() -> {//демон поток ожидающий файлы от сервера
+//            try {
+//                while (true) {
+//                    AbstractMessage am = Network.readObject();//ожидает любые сообщения от сервера
+//                    if (am instanceof FileMessage) {//если сервер прислал FileMessage
+//                        FileMessage fm = (FileMessage) am;//кастует полученное сообщение к FileMessage
+//                        Files.write(Paths.get("client_storage/"
+//                                + fm.getFilename()), fm.getData(), StandardOpenOption.CREATE);//записывает полученный файл в client_storage
+//                        refreshLocalFilesList();//обновляет список файлов в client_storage
+//                    }
+//                }
+//            } catch (ClassNotFoundException | IOException e) {
+//                e.printStackTrace();
+//            } finally {
+//                Network.stop();
+//            }
+//        });
+//        t.setDaemon(true);
+//        t.start();
+//        refreshLocalFilesList();
+//    }
+
+    //    //действие по кнопке downloadServerButton. Загрузка файла на сервер
+//    public void downloadFileServer (ActionEvent actionEvent) {
+//        if (fileNameField.getLength() > 0) {
+//            Network.sendMsg(new FileRequest(fileNameField.getText()));//клиент посылает серверу FileRequest с именем интересующего файла
+//            fileNameField.clear();//очищает форму в интерфейсе
+//        }
+//    }
+//
+//    //действие по кнопке uploadServerButton. Загрузка файла на клиент
+//    public void uploadFileClient(ActionEvent actionEvent) throws IOException {
+//        if (fileNameField.getLength() > 0) {
+//            if (Files.exists(Paths.get("client_storage/" + fileNameField.getText()))) {
+//                Network.sendMsg(new FileMessage(Paths.get("client_storage/" + fileNameField.getText())));
+//                fileNameField.clear();
+//            }
+//        }
+//    }
+//
     //обновление списка локальных файлов
     public void refreshLocalFilesList() {
         Platform.runLater(() -> {
@@ -93,5 +129,6 @@ public class Controller implements Initializable {
             }
         });
     }
-
 }
+
+
