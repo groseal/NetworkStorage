@@ -1,9 +1,6 @@
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -37,7 +34,7 @@ public class Network {
                     .remoteAddress(new InetSocketAddress("localhost", 8189))//адрес соединения
                     .handler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast();
+                            socketChannel.pipeline().addLast(new ClientHandler());
                             currentChannel = socketChannel;//ссылка на socketChannel
                         }
                     });

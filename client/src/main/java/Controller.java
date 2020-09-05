@@ -13,6 +13,7 @@ import java.nio.channels.Channel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 
@@ -52,14 +53,25 @@ public class Controller implements Initializable {
         refreshLocalFilesList();
     }
 
+    //Получение файла с сервера
     public void uploadFileClient(ActionEvent actionEvent) throws Exception {
-
+        ProtoFileSender.requestFile((byte) 26, Paths.get(fileNameField.getText()), Network.getInstance().getCurrentChannel(), future -> {
+            if (!future.isSuccess()) {//действие при неудачном получении файла
+                future.cause().printStackTrace();
+//                Network.getInstance().stop();
+            }
+            if (future.isSuccess()) {//действие при удачном получении файла
+                System.out.println("Файл успешно получен");
+//                Network.getInstance().stop();
+            }
+        });
+        fileNameField.clear();//очищает форму в интерфейсе
     }
 
-
-    public void downloadFileServer(ActionEvent actionEvent) throws Exception{
+    //Отправка файла на сервер
+    public void downloadFileServer(ActionEvent actionEvent) throws Exception {
         //Действия по finishListener (из ProtoFileSender, метод sendFile)
-        ProtoFileSender.sendFile((byte) 25, Paths.get("client_storage/"+fileNameField.getText()), Network.getInstance().getCurrentChannel(), future -> {//указываем файл и сеть для отправки
+        ProtoFileSender.sendFile((byte) 25, Paths.get("client_storage/" + fileNameField.getText()), Network.getInstance().getCurrentChannel(), future -> {//указываем файл и сеть для отправки
             if (!future.isSuccess()) {//действие при неудачной передаче файла
                 future.cause().printStackTrace();
 //                Network.getInstance().stop();
@@ -71,7 +83,6 @@ public class Controller implements Initializable {
         });
         fileNameField.clear();//очищает форму в интерфейсе
     }
-
 
 
 //        Network.start();
