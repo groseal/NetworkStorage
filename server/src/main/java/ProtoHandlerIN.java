@@ -29,16 +29,17 @@ public class ProtoHandlerIN extends ChannelInboundHandlerAdapter {
                 gettingFileLength(buf);//получаем длину файла
                 getFile(buf);//получаем файл
             } else if (readed == 26) {//пришел сигнальный байт соответствующий запросу файла с сервера
-                gettingFileLength(buf);//получаем длину имени запрашиваемого файла
+                gettingFileNameLength(buf);//получаем длину имени запрашиваемого файла
                 String fileName = new String(getFileName(buf));//получаем имя запрашиваемого файла
                 if ((new File("server_storage/"+fileName)).exists()){//если искомый файл существует
-                    ProtoFileSender.sendFile((byte) 25, Paths.get("server_storage/2.txt"), ctx.channel(), future -> {//указываем файл и сеть для отправки
+                    System.out.println("Искомый файл "+fileName+" существует на сервере");
+                    ProtoFileSender.sendFile(Paths.get("server_storage/"+fileName), ctx.channel(), future -> {//указываем файл и сеть для отправки
                         if (!future.isSuccess()) {//действие при неудачной передаче файла
                             future.cause().printStackTrace();
 //                Network.getInstance().stop();
                         }
                         if (future.isSuccess()) {//действие при удачной передаче файла
-                            System.out.println("Файл успешно передан");
+                            System.out.println("Файл "+fileName+" успешно передан");
 //                Network.getInstance().stop();
                         }
                     });
@@ -87,6 +88,7 @@ public class ProtoHandlerIN extends ChannelInboundHandlerAdapter {
                 out.close();//закрываем файл в который писали байты
                 break;//останавливаем получение
             }
+//            if (buf.readableBytes()==0){buf.release();}
         }
     }
 

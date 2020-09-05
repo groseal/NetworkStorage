@@ -9,7 +9,7 @@ import java.nio.file.Path;
 
 //как отправляются данные
 public class ProtoFileSender {
-    public static void sendFile(byte signalByte, Path path, Channel channel, ChannelFutureListener finishListener) throws IOException {
+    public static void sendFile(Path path, Channel channel, ChannelFutureListener finishListener) throws IOException {
         FileRegion region = new DefaultFileRegion(path.toFile(), 0, Files.size(path));//создаем ссылку на кусок отправляемого файла (путь к файлу, начало куска, размер куска)
 
         byte[] fileNameBytes = path.getFileName().toString().getBytes(StandardCharsets.UTF_8);
@@ -49,7 +49,7 @@ public class ProtoFileSender {
         }
     }
 
-    public static void requestFile(byte signalByte, Path path, Channel channel, ChannelFutureListener finishListener) throws IOException {
+    public static void requestFile(Path path, Channel channel, ChannelFutureListener finishListener) throws IOException {
         //посылаем на сервер сигнальный байт
         // 26 байт - запрос файла
         byte[]fileNameBytes = path.getFileName().toString().getBytes(StandardCharsets.UTF_8);

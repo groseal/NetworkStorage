@@ -26,9 +26,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                 out = new BufferedOutputStream(new FileOutputStream("client_storage/" + new String(fileName)));//открываем BufferedOutputStream для получения данных файла
                 gettingFileLength(buf);//получаем длину файла
                 getFile(buf);//получаем файл
-            } else {
-                System.out.println("ERROR CL: Invalid first byte - " + readed);//сообщаем об ошибке
+
+//            } else {
+//                System.out.println("ERROR CL: Invalid first byte - " + readed);//сообщаем об ошибке
             }
+//            if (buf.readableBytes()==0){buf.release();}
         }
     }
 
@@ -58,6 +60,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     //получаем файл
+
     private void getFile(ByteBuf buf) throws Exception {
         while (buf.readableBytes() > 0) {//если в буфере есть непрочитанные байты
             out.write(buf.readByte());//пишем побайтово непрочитанные байты в файл

@@ -55,7 +55,7 @@ public class Controller implements Initializable {
 
     //Получение файла с сервера
     public void uploadFileClient(ActionEvent actionEvent) throws Exception {
-        ProtoFileSender.requestFile((byte) 26, Paths.get(fileNameField.getText()), Network.getInstance().getCurrentChannel(), future -> {
+        ProtoFileSender.requestFile(Paths.get(fileNameField.getText()), Network.getInstance().getCurrentChannel(), future -> {
             if (!future.isSuccess()) {//действие при неудачном получении файла
                 future.cause().printStackTrace();
 //                Network.getInstance().stop();
@@ -71,7 +71,7 @@ public class Controller implements Initializable {
     //Отправка файла на сервер
     public void downloadFileServer(ActionEvent actionEvent) throws Exception {
         //Действия по finishListener (из ProtoFileSender, метод sendFile)
-        ProtoFileSender.sendFile((byte) 25, Paths.get("client_storage/" + fileNameField.getText()), Network.getInstance().getCurrentChannel(), future -> {//указываем файл и сеть для отправки
+        ProtoFileSender.sendFile(Paths.get("client_storage/" + fileNameField.getText()), Network.getInstance().getCurrentChannel(), future -> {//указываем файл и сеть для отправки
             if (!future.isSuccess()) {//действие при неудачной передаче файла
                 future.cause().printStackTrace();
 //                Network.getInstance().stop();
